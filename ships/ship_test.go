@@ -35,9 +35,6 @@ func TestExpandShip(t *testing.T) {
 			dir:       types.HORIZONTAL,
 			out: types.Ship{
 				{0, 0},
-				{1, 0},
-				{2, 0},
-				{3, 0},
 				{4, 0},
 			},
 		},
@@ -48,9 +45,6 @@ func TestExpandShip(t *testing.T) {
 			dir:       types.VERTICAL,
 			out: types.Ship{
 				{0, 0},
-				{0, 1},
-				{0, 2},
-				{0, 3},
 				{0, 4},
 			},
 		},

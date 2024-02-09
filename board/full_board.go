@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-type fullBoard map[int]map[int]string
+type fullBoard map[int][]string
 
 func fullFromString(s string) (fullBoard, error) {
 
@@ -20,25 +20,25 @@ func fullFromString(s string) (fullBoard, error) {
 	}
 
 	var b fullBoard = make(fullBoard)
-	b[0] = make(map[int]string)
+	b[0] = []string{}
 
-	var row, col int
+	var x, y int
 	for _, r := range board {
 		if r == '\n' {
 			continue
 		}
-		if col%dim == 0 {
-			if col > 0 {
-				row++
+		if x%dim == 0 {
+			if x > 0 {
+				y++
 			}
-			if row > dim-1 {
+			if y > dim-1 {
 				break
 			}
-			col = 0
-			b[row] = make(map[int]string)
+			x = 0
 		}
-		b[row][col] = string(r)
-		col++
+
+		b[x] = append(b[x], string(r))
+		x++
 	}
 
 	return b, nil

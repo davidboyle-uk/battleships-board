@@ -12,7 +12,7 @@ func TestBoardFromString(t *testing.T) {
 		in  string
 		out types.Board
 	}{
-		"valid a": {
+		"valid": {
 			in: `10
 ----------
 ----------
@@ -25,30 +25,27 @@ func TestBoardFromString(t *testing.T) {
 --m-------
 ------m---`,
 			out: types.Board{
-				Hit: []types.Coord{
-					{7, 7},
-					{7, 8},
-				},
-				Miss: []types.Coord{
-					{2, 8},
-					{4, 8},
-					{5, 3},
-					{5, 5},
-					{6, 6},
-					{7, 1},
-					{7, 5},
-					{7, 6},
-					{8, 2},
-					{9, 6},
-				},
-				Destoyed: []types.Coord{
-					{X: 4, Y: 2},
+				Dim: 10,
+				Moves: types.Moves{
+					{1, 7}: {State: 109},
+					{2, 4}: {State: 100},
+					{2, 8}: {State: 109},
+					{3, 5}: {State: 109},
+					{5, 5}: {State: 109},
+					{5, 7}: {State: 109},
+					{6, 6}: {State: 109},
+					{6, 7}: {State: 109},
+					{6, 9}: {State: 109},
+					{7, 7}: {State: 104},
+					{8, 2}: {State: 109},
+					{8, 4}: {State: 109},
+					{8, 7}: {State: 104},
 				},
 			},
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
-			actual, err := boardFromString(tt.in)
+			actual, err := BoardFromString(tt.in)
 			if err != nil {
 				t.Fatal(err)
 			}

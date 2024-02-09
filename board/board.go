@@ -7,13 +7,7 @@ import (
 	"battleships-board/types"
 )
 
-const (
-	HIT       = 'h'
-	MISS      = 'm'
-	DESTROYED = 'd'
-)
-
-func boardFromString(s string) (types.Board, error) {
+func BoardFromString(s string) (types.Board, error) {
 
 	dim, board, err := getBoardSize(s)
 	if err != nil {
@@ -26,31 +20,33 @@ func boardFromString(s string) (types.Board, error) {
 		return types.Board{}, fmt.Errorf("board length is %v or more [%v]", max, l)
 	}
 
-	var b types.Board
+	b := types.Board{
+		Dim:   dim,
+		Moves: make(types.Moves),
+	}
 
 	var x, y int
 	for _, r := range board {
 		if r == '\n' {
 			continue
 		}
-		if y%dim == 0 {
-			if y > 0 {
-				x++
+		if x%dim == 0 {
+			if x > 0 {
+				y++
 			}
-			if x > dim-1 {
+			if y > dim-1 {
 				break
 			}
-			y = 0
+			x = 0
 		}
-		switch r {
-		case HIT:
-			b.Hit = append(b.Hit, types.Coord{X: x, Y: y})
-		case MISS:
-			b.Miss = append(b.Miss, types.Coord{X: x, Y: y})
-		case DESTROYED:
-			b.Destoyed = append(b.Destoyed, types.Coord{X: x, Y: y})
+
+		s := types.State(r)
+		if s != types.SEA {
+			b.Moves[types.Coord{X: x, Y: y}] = types.CoordState{
+				State: s,
+			}
 		}
-		y++
+		x++
 	}
 
 	return b, nil
