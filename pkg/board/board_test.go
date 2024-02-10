@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"battleships-board/types"
+	"github.com/dbx123/battleships-board/types"
 )
 
 func TestBoardFromString(t *testing.T) {

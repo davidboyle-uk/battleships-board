@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"os"
 
-	"battleships-board/pkg/ai"
-	"battleships-board/pkg/board"
-	"battleships-board/pkg/game"
-	"battleships-board/types"
+	"github.com/dbx123/battleships-board/pkg/ai"
+	"github.com/dbx123/battleships-board/pkg/board"
+	"github.com/dbx123/battleships-board/pkg/game"
+	"github.com/dbx123/battleships-board/types"
 )
 
 const (

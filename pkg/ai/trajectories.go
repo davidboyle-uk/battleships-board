@@ -1,7 +1,7 @@
 package ai
 
 import (
-	"battleships-board/types"
+	"github.com/dbx123/battleships-board/types"
 )
 
 func traceTrajectories(b types.Board, pointsOnBoard []types.Coord) types.Trajectories {

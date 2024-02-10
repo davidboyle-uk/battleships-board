@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"battleships-board/pkg/board"
-	"battleships-board/types"
+	"github.com/dbx123/battleships-board/pkg/board"
+	"github.com/dbx123/battleships-board/types"
 )
 
 func TestCombineProbabilities(t *testing.T) {

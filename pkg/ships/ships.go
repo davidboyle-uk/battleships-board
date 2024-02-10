@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	"battleships-board/types"
+	"github.com/dbx123/battleships-board/types"
 )
 
 func GenerateShips(boardSize int) types.Ships {

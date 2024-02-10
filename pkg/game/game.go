@@ -1,8 +1,8 @@
 package game
 
 import (
-	"battleships-board/pkg/ships"
-	"battleships-board/types"
+	"github.com/dbx123/battleships-board/pkg/ships"
+	"github.com/dbx123/battleships-board/types"
 )
 
 func Initialise(boardSize int) types.Game {
