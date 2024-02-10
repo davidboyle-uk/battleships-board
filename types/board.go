@@ -1,29 +1,30 @@
 package types
 
-type State rune
-
-const (
-	SEA  State = '-'
-	HIT  State = 'h'
-	MISS State = 'm'
-	SUNK State = 'd'
+import (
+	"fmt"
+	"strconv"
 )
 
-func (s State) String() string {
-	return string(s)
-}
+type State string
+
+const (
+	SEA  State = "-"
+	HIT  State = "h"
+	MISS State = "m"
+	SUNK State = "d"
+)
 
 type Moves map[Coord]CoordState
 
 type CoordState struct {
-	Ship  *Ship
+	Ship  Ship
 	State State
 }
 
 type Board struct {
-	Dim   int
-	Moves Moves
-	Ships []*Ship
+	Dim     int
+	Moves   Moves
+	ShipTot int
 }
 
 func (b Board) HasHits() bool {
@@ -53,4 +54,21 @@ func (b Board) GetSunk() []Coord {
 		}
 	}
 	return sunk
+}
+
+func (b Board) ToString() string {
+	var s string
+	s += fmt.Sprintln(strconv.Itoa(b.Dim))
+	for y := 0; y <= b.Dim-1; y++ {
+		for x := 0; x <= b.Dim-1; x++ {
+			if move, ok := b.Moves[Coord{X: x, Y: y}]; ok {
+				s += string(move.State)
+			} else {
+				s += string(SEA)
+			}
+		}
+		s += "\n"
+	}
+
+	return s
 }

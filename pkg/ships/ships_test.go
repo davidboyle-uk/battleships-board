@@ -1,4 +1,4 @@
-package ship
+package ships
 
 import (
 	"reflect"
@@ -15,7 +15,7 @@ func TestRandCoord(t *testing.T) {
 }
 
 func TestPrintInPlayShips(t *testing.T) {
-	ships := generateShips(10)
+	ships := GenerateShips(10)
 	t.Fatalf("%v\n%s", ships, ships.AsString())
 }
 
@@ -34,8 +34,13 @@ func TestExpandShip(t *testing.T) {
 			t:         types.CARRIER,
 			dir:       types.HORIZONTAL,
 			out: types.Ship{
-				{0, 0},
-				{4, 0},
+				Coords: []types.Coord{
+					{0, 0},
+					{1, 0},
+					{2, 0},
+					{3, 0},
+					{4, 0},
+				},
 			},
 		},
 		"carrier v": {
@@ -44,8 +49,13 @@ func TestExpandShip(t *testing.T) {
 			t:         types.CARRIER,
 			dir:       types.VERTICAL,
 			out: types.Ship{
-				{0, 0},
-				{0, 4},
+				Coords: []types.Coord{
+					{0, 0},
+					{0, 1},
+					{0, 2},
+					{0, 3},
+					{0, 4},
+				},
 			},
 		},
 	} {
@@ -62,7 +72,7 @@ func TestExpandShip(t *testing.T) {
 }
 
 func TestGenerateShips(t *testing.T) {
-	ships := generateShips(10)
+	ships := GenerateShips(10)
 	if len(ships) != 7 {
 		t.Fatalf("%#v", len(ships))
 	}
@@ -76,32 +86,40 @@ func TestHasCollisions(t *testing.T) {
 	}{
 		"does": {
 			ship: types.Ship{
-				{0, 1},
+				Coords: []types.Coord{
+					{0, 1},
+				},
 			},
 			inPlay: types.Ships{
 				types.Ship{
-					{0, 0},
-					{0, 1},
-					{0, 2},
-					{0, 3},
-					{0, 4},
-					{0, 5},
+					Coords: []types.Coord{
+						{0, 0},
+						{0, 1},
+						{0, 2},
+						{0, 3},
+						{0, 4},
+						{0, 5},
+					},
 				},
 			},
 			expected: true,
 		},
 		"doesnt": {
 			ship: types.Ship{
-				{6, 1},
+				Coords: []types.Coord{
+					{6, 1},
+				},
 			},
 			inPlay: types.Ships{
 				types.Ship{
-					{0, 0},
-					{0, 1},
-					{0, 2},
-					{0, 3},
-					{0, 4},
-					{0, 5},
+					Coords: []types.Coord{
+						{0, 0},
+						{0, 1},
+						{0, 2},
+						{0, 3},
+						{0, 4},
+						{0, 5},
+					},
 				},
 			},
 			expected: false,

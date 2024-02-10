@@ -4,9 +4,101 @@ import (
 	"reflect"
 	"testing"
 
-	"battleships-board/board"
+	"battleships-board/pkg/board"
 	"battleships-board/types"
 )
+
+func TestCombineProbabilities(t *testing.T) {
+	for name, tt := range map[string]struct {
+		probabilities types.Probabilities
+		expected      types.Probabilities
+	}{
+		"a": {
+			probabilities: types.Probabilities{
+				5: []types.Coord{{1, 6}},
+				6: []types.Coord{{2, 7}, {4, 7}, {6, 7}, {7, 6}},
+				7: []types.Coord{{3, 6}},
+				8: []types.Coord{{2, 5}, {3, 6}, {4, 5}, {5, 6}, {6, 5}, {5, 6}},
+			},
+			expected: types.Probabilities{
+				10: []types.Coord{{1, 6}},
+				12: []types.Coord{{2, 7}, {4, 7}, {6, 7}, {7, 6}},
+				16: []types.Coord{{2, 5}, {4, 5}, {6, 5}},
+				22: []types.Coord{{3, 6}},
+				23: []types.Coord{{3, 6}},
+				24: []types.Coord{{5, 6}},
+			},
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			actual := combineProbabilities(tt.probabilities)
+			if !reflect.DeepEqual(tt.expected, actual) {
+				t.Fatalf("\nexpected\n%#v\ngot\n%#v\n", tt.expected, actual)
+			}
+		})
+	}
+}
+
+func TestCalcProbabilities(t *testing.T) {
+	for name, tt := range map[string]struct {
+		boardString     string
+		hitTrajectories types.Trajectories
+		out             types.Probabilities
+	}{
+		"a": {
+			boardString: `10
+m-m-mm--h-
+-m-mm--m-m
+m-mm--m-m-
+-hm--m-m--
+mh--dmhhhh
+-m-mmm--m-
+m-h-h-h--m
+-m-d---m--
+m-m--m--m-
+-m--m-m--h`,
+			hitTrajectories: types.Trajectories{
+				{1, 4}: types.Trajectory{1: []types.Coord{{1, 3}}},
+			},
+			out: types.Probabilities{7: []types.Coord{types.Coord{X: 1, Y: 2}}},
+		},
+		"b": {
+			boardString: `10
+----------
+----------
+----------
+----------
+----------
+----------
+--h-h-h---
+----------
+----------
+----------`,
+			hitTrajectories: types.Trajectories{
+				{2, 6}: types.Trajectory{},
+				{4, 6}: types.Trajectory{},
+				{6, 6}: types.Trajectory{},
+			},
+			out: types.Probabilities{
+				5: []types.Coord{{1, 6}},
+				6: []types.Coord{{2, 7}, {4, 7}, {6, 7}, {7, 6}},
+				7: []types.Coord{{3, 6}},
+				8: []types.Coord{{2, 5}, {3, 6}, {4, 5}, {5, 6}, {6, 5}, {5, 6}}},
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			b, err := board.BoardFromString(tt.boardString)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			actual := calcProbabilities(b, tt.hitTrajectories, types.NewFleet())
+			if !reflect.DeepEqual(tt.out, actual) {
+				t.Fatalf("\nexpected\n%#v\ngot\n%#v\n", tt.out, actual)
+			}
+		})
+	}
+}
 
 func TestCalcMoveBasedOnProbability(t *testing.T) {
 	for name, tt := range map[string]struct {
@@ -27,50 +119,19 @@ func TestCalcMoveBasedOnProbability(t *testing.T) {
 ------m---`,
 			out: types.Coord{9, 7},
 		},
-	} {
-		t.Run(name, func(t *testing.T) {
-			b, err := board.BoardFromString(tt.boardString)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			actual := calcMoveBasedOnProbability(b)
-			if !reflect.DeepEqual(tt.out, actual) {
-				t.Fatalf("\nexpected\n%#v\ngot\n%#v\n", tt.out, actual)
-			}
-		})
-	}
-}
-
-func TestTraceTrajectories(t *testing.T) {
-	for name, tt := range map[string]struct {
-		boardString string
-		out         types.Trajectories
-	}{
-		"a": {
+		"b": {
 			boardString: `10
-----------
-----------
---------m-
-----------
---d-----m-
----m-m----
-------m---
--m---mmhh-
---m-------
-------m---`,
-			out: types.Trajectories{
-				{7, 7}: types.Trajectory{
-					3: []types.Coord{
-						{8, 7},
-					},
-				},
-				{8, 7}: types.Trajectory{
-					2: []types.Coord{
-						{7, 7},
-					},
-				},
-			},
+m-m-mm--h-
+-m-mm--m-m
+m-mm--m-m-
+-hm--m-m--
+mh--dmhhhh
+-m-mmm--m-
+m-h-h-h--m
+-m-d---m--
+m-m--m--m-
+-m--m-m--h`,
+			out: types.Coord{6, 5},
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
@@ -79,8 +140,7 @@ func TestTraceTrajectories(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			hitsOnBoard := b.GetHits()
-			actual := traceTrajectories(b, hitsOnBoard)
+			actual := calcMoveBasedOnProbability(b)
 			if !reflect.DeepEqual(tt.out, actual) {
 				t.Fatalf("\nexpected\n%#v\ngot\n%#v\n", tt.out, actual)
 			}
@@ -175,10 +235,11 @@ func TestCalcCoordSpace(t *testing.T) {
 ------m---`,
 			target: types.Coord{8, 0},
 			out: types.CoordSpace{
-				MinX: 0,
-				MaxX: 9,
-				MinY: 0,
-				MaxY: 1,
+				Coord: types.Coord{8, 0},
+				MinX:  0,
+				MaxX:  9,
+				MinY:  0,
+				MaxY:  1,
 			},
 		},
 		"4,0": {
@@ -195,10 +256,11 @@ func TestCalcCoordSpace(t *testing.T) {
 ------m---`,
 			target: types.Coord{4, 0},
 			out: types.CoordSpace{
-				MinX: 0,
-				MaxX: 9,
-				MinY: 0,
-				MaxY: 9,
+				Coord: types.Coord{4, 0},
+				MinX:  0,
+				MaxX:  9,
+				MinY:  0,
+				MaxY:  9,
 			},
 		},
 	} {

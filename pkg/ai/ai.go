@@ -18,7 +18,7 @@ import (
 			// bounds of map prevent
 */
 
-func calculateMove(b types.Board) types.Coord {
+func CalculateMove(b types.Board) types.Coord {
 	if !b.HasHits() {
 		return calcMoveWhenNoHits(b)
 	}
@@ -28,30 +28,82 @@ func calculateMove(b types.Board) types.Coord {
 func calcMoveBasedOnProbability(b types.Board) types.Coord {
 	hitsOnBoard := b.GetHits()
 	sunkOnBoard := b.GetSunk()
+	// get the trajectories for the current hits
 	hitTrajectories := traceTrajectories(b, hitsOnBoard)
 	remainingShips := calcRemainingShips(b, sunkOnBoard)
-	probabilities := calcProbabilities(b, hitTrajectories, remainingShips)
-	mostProbable := mostProbable(probabilities)
+	// calculate by extending existing trajectores in the relevant direction
+	allProbabilities := calcProbabilities(b, hitTrajectories, remainingShips)
+	probabilities := combineProbabilities(allProbabilities)
+	if len(probabilities) > 0 {
+		mostProbable := mostProbable(probabilities)
+		return pickCoordFromSlice(mostProbable)
+	}
 
-	return pickCoordFromSlice(mostProbable)
+	return calcMoveWhenNoHits(b)
+}
+
+func combineProbabilities(allProbabilities types.Probabilities) types.Probabilities {
+	var combinedProbabilities = make(types.Probabilities)
+
+	for sourceBaseScore, sourceBaseCoords := range allProbabilities {
+		for _, c := range sourceBaseCoords {
+			totalScore := sourceBaseScore
+			for targetBaseScore, targetBaseCoords := range allProbabilities {
+				for _, t := range targetBaseCoords {
+					if c == t {
+						totalScore += targetBaseScore
+					}
+				}
+			}
+			if !contains(combinedProbabilities[totalScore], c) {
+				combinedProbabilities[totalScore] = append(combinedProbabilities[totalScore], c)
+			}
+		}
+	}
+
+	return combinedProbabilities
+}
+
+func contains(h []types.Coord, t types.Coord) bool {
+	for _, v := range h {
+		if t == v {
+			return true
+		}
+	}
+	return false
 }
 
 func calcProbabilities(b types.Board, hitTrajectories types.Trajectories, remainingShips types.Fleet) types.Probabilities {
 	var probabilities = make(types.Probabilities)
 
 	for origin, trajectories := range hitTrajectories {
-		for direction, trajectory := range trajectories {
-			move := types.PossibleMoves[direction]
-			if move.IsOutOfBounds(b.Dim) {
-				continue
+		switch len(trajectories) {
+		case 0:
+			for direction, move := range types.PossibleMoves {
+				next := origin.Add(move)
+				if next.IsOutOfBounds(b.Dim) {
+					continue
+				}
+				trajectory := []types.Coord{origin}
+				if _, ok := b.Moves[next]; !ok {
+					probability := calcProbability(b.Dim, origin, direction, trajectory, remainingShips)
+					probabilities[probability] = append(probabilities[probability], next)
+					continue
+				}
 			}
-			last := trajectory[len(trajectory)-1]
-			next := last.Add(move)
-			if _, ok := b.Moves[next]; !ok {
-				probability := calcProbability(b.Dim, origin, direction, trajectory, remainingShips)
-				probabilities[probability] = append(probabilities[probability], next)
+		default:
+			for direction, trajectory := range trajectories {
+				move := types.PossibleMoves[direction]
+				last := trajectory[len(trajectory)-1]
+				next := last.Add(move)
+				if next.IsOutOfBounds(b.Dim) {
+					continue
+				}
+				if _, ok := b.Moves[next]; !ok {
+					probability := calcProbability(b.Dim, origin, direction, trajectory, remainingShips)
+					probabilities[probability] = append(probabilities[probability], next)
+				}
 			}
-			continue
 		}
 	}
 

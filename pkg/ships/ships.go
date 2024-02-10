@@ -1,4 +1,4 @@
-package ship
+package ships
 
 import (
 	"fmt"
@@ -7,13 +7,7 @@ import (
 	"battleships-board/types"
 )
 
-func sortShips(s types.Ships) {
-	sort.Slice(s, func(i, j int) bool {
-		return len(s[i]) < len(s[j])
-	})
-}
-
-func generateShips(boardSize int) types.Ships {
+func GenerateShips(boardSize int) types.Ships {
 	var ships types.Ships
 	for _, s := range types.NewFleet() {
 		for i := 1; i <= s.Num; i++ {
@@ -21,6 +15,14 @@ func generateShips(boardSize int) types.Ships {
 		}
 	}
 	return ships
+}
+
+func GetVolume(ships []types.Ship) int {
+	var vol int
+	for _, s := range ships {
+		vol += len(s.Coords)
+	}
+	return vol
 }
 
 func generateShip(boardSize int, g types.Ships, t types.ShipType) types.Ship {
@@ -39,8 +41,8 @@ func generateShip(boardSize int, g types.Ships, t types.ShipType) types.Ship {
 
 func hasCollisions(s types.Ship, g types.Ships) bool {
 	for _, i := range g {
-		for _, t := range i {
-			for _, c := range s {
+		for _, t := range i.Coords {
+			for _, c := range s.Coords {
 				if c == t {
 					return true
 				}
@@ -52,7 +54,7 @@ func hasCollisions(s types.Ship, g types.Ships) bool {
 
 func expandShip(c types.Coord, boardSize int, t types.ShipType, dir types.ShipDirection) (types.Ship, error) {
 	ship := types.Ship{
-		c,
+		Coords: []types.Coord{c},
 	}
 
 	l := int(t)
@@ -61,25 +63,27 @@ func expandShip(c types.Coord, boardSize int, t types.ShipType, dir types.ShipDi
 	}
 
 	var next types.Coord
-	switch dir {
-	case types.HORIZONTAL:
-		next = types.Coord{
-			c.X + int(t) - 1,
-			c.Y,
+	for i := 1; i <= int(t)-1; i++ {
+		switch dir {
+		case types.HORIZONTAL:
+			next = types.Coord{
+				c.X + i,
+				c.Y,
+			}
+			if next.IsOutOfBounds(boardSize) {
+				return types.Ship{}, fmt.Errorf("out of bounds")
+			}
+			ship.Coords = append(ship.Coords, next)
+		case types.VERTICAL:
+			next = types.Coord{
+				c.X,
+				c.Y + i,
+			}
+			if next.IsOutOfBounds(boardSize) {
+				return types.Ship{}, fmt.Errorf("out of bounds")
+			}
+			ship.Coords = append(ship.Coords, next)
 		}
-		if next.IsOutOfBounds(boardSize) {
-			return types.Ship{}, fmt.Errorf("out of bounds")
-		}
-		ship = append(ship, next)
-	case types.VERTICAL:
-		next = types.Coord{
-			c.X,
-			c.Y + int(t) - 1,
-		}
-		if next.IsOutOfBounds(boardSize) {
-			return types.Ship{}, fmt.Errorf("out of bounds")
-		}
-		ship = append(ship, next)
 	}
 
 	return ship, nil
@@ -90,4 +94,10 @@ func randCoord(boardSize int) types.Coord {
 		types.RandNum(boardSize),
 		types.RandNum(boardSize),
 	}
+}
+
+func sortShips(s types.Ships) {
+	sort.Slice(s, func(i, j int) bool {
+		return len(s[i].Coords) < len(s[j].Coords)
+	})
 }
