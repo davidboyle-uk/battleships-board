@@ -2,6 +2,12 @@
 
 Battleshups board and AI implementation for
 
+## Run
+
+```
+go run main.go -p
+```
+
 ## Tests
 
 ```

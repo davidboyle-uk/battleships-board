@@ -3,14 +3,16 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"os"
 
 	"github.com/dbx123/battleships-board/pkg/ai"
-	"github.com/dbx123/battleships-board/pkg/board"
 	"github.com/dbx123/battleships-board/pkg/game"
 	"github.com/dbx123/battleships-board/types"
 )
+
+var pauseBetweenMoves bool = false
 
 const (
 	ROW_NUMBER int = 1024
@@ -40,6 +42,11 @@ func init() {
 }
 
 func main() {
+	// Pause Between Moves?
+	flag.BoolVar(&pauseBetweenMoves, "p", false, "Wait for user to continue after each move?")
+
+	flag.Parse()
+
 	newGame := game.Initialise(10)
 	simulate(newGame)
 }
@@ -59,20 +66,35 @@ func simulate(g types.Game) {
 
 func takeTurn(g types.Game) (string, error) {
 	cleanScreen()
-	shooter, opponent := determineWhosTurn(g)
-	opponentBoardString := opponent.Board.ToString()
-	theirBoardAsWeSeeIt, err := board.BoardFromString(opponentBoardString)
-	if err != nil {
-		panic(err)
-	}
-	move := ai.CalculateMove(theirBoardAsWeSeeIt)
+
+	p1 := g.Players[0]
+	p2 := g.Players[1]
+
+	shooter, opponent := determineWhosTurn(p1, p2)
+	move := ai.CalculateMove(types.Board{
+		Dim:   shooter.Board.Dim,
+		Moves: shooter.Moves,
+	})
+
+	fmt.Println(shooter.Name, " -> ", move)
+
 	winner := shoot(shooter, opponent, move)
+	fmt.Print("\n")
+	fmt.Printf("Player 1: Moves %v Hits %v\n", len(p1.Moves), p1.Hits)
+	fmt.Printf("Player 2: Moves %v Hits %v\n", len(p2.Moves), p2.Hits)
+	fmt.Print("\n")
 	if winner != "" {
 		return winner, nil
 	}
-	fmt.Println(shooter.Name, " -> ", move)
-	fmt.Println(opponent.Board.ToString())
-	//consolePause(PAUSE_MEX)
+
+	fmt.Println(types.Board{
+		Dim:   opponent.Board.Dim,
+		Moves: opponent.Moves,
+	}.ToString())
+	if pauseBetweenMoves {
+		consolePause(PAUSE_MEX)
+	}
+
 	return "", nil
 }
 
@@ -90,17 +112,10 @@ func shoot(from, to *types.Player, t types.Coord) string {
 	return r
 }
 
-func determineWhosTurn(g types.Game) (*types.Player, *types.Player) {
-	p1 := g.Players[0]
-	p2 := g.Players[1]
-
-	fmt.Printf("p1 Moves %v Hits %v\n", len(p1.Moves), p1.Hits)
-	fmt.Printf("p2 Moves %v Hits %v\n", len(p2.Moves), p2.Hits)
-
+func determineWhosTurn(p1, p2 *types.Player) (*types.Player, *types.Player) {
 	if len(p1.Moves) == len(p2.Moves) {
 		return p1, p2
 	}
-
 	return p2, p1
 }
 
