@@ -17,14 +17,6 @@ func GenerateShips(boardSize int) types.Ships {
 	return ships
 }
 
-func GetVolume(ships []types.Ship) int {
-	var vol int
-	for _, s := range ships {
-		vol += len(s.Coords)
-	}
-	return vol
-}
-
 func generateShip(boardSize int, g types.Ships, t types.ShipType) types.Ship {
 	for {
 		for _, dir := range types.ShipDirections {

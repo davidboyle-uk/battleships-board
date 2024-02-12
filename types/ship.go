@@ -38,3 +38,11 @@ func (i Ships) AsString() string {
 	}
 	return r
 }
+
+func (i Ships) GetVolume() int {
+	var vol int
+	for _, s := range i {
+		vol += len(s.Coords)
+	}
+	return vol
+}

@@ -102,3 +102,83 @@ hhhh------
 		})
 	}
 }
+
+func TestAddShips(t *testing.T) {
+	testShip := Ship{
+		Coords: []Coord{
+			{0, 0},
+			{0, 1},
+			{0, 2},
+		},
+	}
+
+	for name, tt := range map[string]struct {
+		ships    Ships
+		expected Board
+	}{
+		"sinlgle ship": {
+			ships: Ships{
+				testShip,
+			},
+			expected: Board{
+				Moves: Moves{
+					"0 0": CoordState{
+						Ship:  &testShip,
+						State: SEA,
+					},
+					"0 1": CoordState{
+						Ship:  &testShip,
+						State: SEA,
+					},
+					"0 2": CoordState{
+						Ship:  &testShip,
+						State: SEA,
+					},
+				},
+			},
+		},
+		"standard fleet": {
+			ships: Ships{
+				Ship{Coords: []Coord{{8, 8}}, Hits: 0},
+				Ship{Coords: []Coord{{5, 6}}, Hits: 0},
+				Ship{Coords: []Coord{{7, 4}, {8, 4}}, Hits: 0},
+				Ship{Coords: []Coord{{2, 9}, {3, 9}}, Hits: 0},
+				Ship{Coords: []Coord{{1, 0}, {2, 0}, {3, 0}}, Hits: 0},
+				Ship{Coords: []Coord{{5, 7}, {6, 7}, {7, 7}, {8, 7}}, Hits: 0},
+				Ship{Coords: []Coord{{1, 1}, {2, 1}, {3, 1}, {4, 1}, {5, 1}}, Hits: 0},
+			},
+			expected: Board{
+				Moves: Moves{
+					"1 0": CoordState{Ship: &Ship{Coords: []Coord{{1, 0}, {2, 0}, {3, 0}}, Hits: 0}, State: "-"},
+					"1 1": CoordState{Ship: &Ship{Coords: []Coord{{1, 1}, {2, 1}, {3, 1}, {4, 1}, {5, 1}}, Hits: 0}, State: "-"},
+					"2 0": CoordState{Ship: &Ship{Coords: []Coord{{1, 0}, {2, 0}, {3, 0}}, Hits: 0}, State: "-"},
+					"2 1": CoordState{Ship: &Ship{Coords: []Coord{{1, 1}, {2, 1}, {3, 1}, {4, 1}, {5, 1}}, Hits: 0}, State: "-"},
+					"2 9": CoordState{Ship: &Ship{Coords: []Coord{{2, 9}, {3, 9}}, Hits: 0}, State: "-"},
+					"3 0": CoordState{Ship: &Ship{Coords: []Coord{{1, 0}, {2, 0}, {3, 0}}, Hits: 0}, State: "-"},
+					"3 1": CoordState{Ship: &Ship{Coords: []Coord{{1, 1}, {2, 1}, {3, 1}, {4, 1}, {5, 1}}, Hits: 0}, State: "-"},
+					"3 9": CoordState{Ship: &Ship{Coords: []Coord{{2, 9}, {3, 9}}, Hits: 0}, State: "-"},
+					"4 1": CoordState{Ship: &Ship{Coords: []Coord{{1, 1}, {2, 1}, {3, 1}, {4, 1}, {5, 1}}, Hits: 0}, State: "-"},
+					"5 1": CoordState{Ship: &Ship{Coords: []Coord{{1, 1}, {2, 1}, {3, 1}, {4, 1}, {5, 1}}, Hits: 0}, State: "-"},
+					"5 6": CoordState{Ship: &Ship{Coords: []Coord{{5, 6}}, Hits: 0}, State: "-"},
+					"5 7": CoordState{Ship: &Ship{Coords: []Coord{{5, 7}, {6, 7}, {7, 7}, {8, 7}}, Hits: 0}, State: "-"},
+					"6 7": CoordState{Ship: &Ship{Coords: []Coord{{5, 7}, {6, 7}, {7, 7}, {8, 7}}, Hits: 0}, State: "-"},
+					"7 4": CoordState{Ship: &Ship{Coords: []Coord{{7, 4}, {8, 4}}, Hits: 0}, State: "-"},
+					"7 7": CoordState{Ship: &Ship{Coords: []Coord{{5, 7}, {6, 7}, {7, 7}, {8, 7}}, Hits: 0}, State: "-"},
+					"8 4": CoordState{Ship: &Ship{Coords: []Coord{{7, 4}, {8, 4}}, Hits: 0}, State: "-"},
+					"8 7": CoordState{Ship: &Ship{Coords: []Coord{{5, 7}, {6, 7}, {7, 7}, {8, 7}}, Hits: 0}, State: "-"},
+					"8 8": CoordState{Ship: &Ship{Coords: []Coord{{8, 8}}, Hits: 0}, State: "-"},
+				},
+			},
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			b := Board{
+				Moves: make(Moves),
+			}
+			b.AddShips(tt.ships)
+			if toJSON(tt.expected) != toJSON(b) {
+				t.Fatalf("\nexpected\n%s\ngot\n%#v\n", toJSON(tt.expected), b)
+			}
+		})
+	}
+}

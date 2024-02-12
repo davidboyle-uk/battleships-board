@@ -7,54 +7,6 @@ import (
 	"github.com/dbx123/battleships-board/types"
 )
 
-func TestAddShipsToBoard(t *testing.T) {
-	testShip := types.Ship{
-		Coords: []types.Coord{
-			{0, 0},
-			{0, 1},
-			{0, 2},
-		},
-	}
-
-	for name, tt := range map[string]struct {
-		ships    types.Ships
-		expected types.Board
-	}{
-		"valid a": {
-			ships: types.Ships{
-				testShip,
-			},
-			expected: types.Board{
-				Moves: types.Moves{
-					"0 0": types.CoordState{
-						Ship:  &testShip,
-						State: types.SEA,
-					},
-					"0 1": types.CoordState{
-						Ship:  &testShip,
-						State: types.SEA,
-					},
-					"0 2": types.CoordState{
-						Ship:  &testShip,
-						State: types.SEA,
-					},
-				},
-				ShipTot: 3,
-			},
-		},
-	} {
-		t.Run(name, func(t *testing.T) {
-			b := types.Board{
-				Moves: make(types.Moves),
-			}
-			actual := addShipsToBoard(b, tt.ships)
-			if toJSON(tt.expected) != toJSON(actual) {
-				t.Fatalf("\nexpected\n%s\ngot\n%s\n", toJSON(tt.expected), toJSON(actual))
-			}
-		})
-	}
-}
-
 func TestTakeShot(t *testing.T) {
 	for name, tt := range map[string]struct {
 		p1_before string
@@ -110,16 +62,16 @@ func TestTakeShot(t *testing.T) {
 	}
 }
 
-func toJSON(data interface{}) string {
-	b, err := json.Marshal(data)
+func prettyPrint(data interface{}) string {
+	b, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		panic(err)
 	}
 	return string(b)
 }
 
-func prettyPrint(data interface{}) string {
-	b, err := json.MarshalIndent(data, "", "  ")
+func toJSON(data interface{}) string {
+	b, err := json.Marshal(data)
 	if err != nil {
 		panic(err)
 	}

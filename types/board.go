@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -86,4 +87,25 @@ func (b Board) ToString() string {
 	}
 
 	return s
+}
+
+func (b Board) AddShips(s Ships) {
+	for _, sh := range s {
+		ns := sh
+		for _, c := range sh.Coords {
+			key := c.String()
+			b.Moves[key] = CoordState{
+				Ship:  &ns,
+				State: SEA,
+			}
+		}
+	}
+}
+
+func toJSON(data interface{}) string {
+	b, err := json.Marshal(data)
+	if err != nil {
+		panic(err)
+	}
+	return string(b)
 }

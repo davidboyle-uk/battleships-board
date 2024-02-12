@@ -23,25 +23,14 @@ func Initialise(boardSize int) types.Game {
 }
 
 func generateBoard(boardSize int) types.Board {
-	b := types.Board{
-		Dim:   boardSize,
-		Moves: make(types.Moves),
-	}
 	s := ships.GenerateShips(boardSize)
-	b = addShipsToBoard(b, s)
-	return b
-}
-
-func addShipsToBoard(b types.Board, s types.Ships) types.Board {
-	for _, ship := range s {
-		for _, c := range ship.Coords {
-			b.Moves[c.String()] = types.CoordState{
-				Ship:  &ship,
-				State: types.SEA,
-			}
-		}
+	shipTot := s.GetVolume()
+	b := types.Board{
+		Dim:     boardSize,
+		Moves:   make(types.Moves, shipTot),
+		ShipTot: shipTot,
 	}
-	b.ShipTot = ships.GetVolume(s)
+	b.AddShips(s)
 	return b
 }
 
