@@ -1,6 +1,10 @@
 # Battleships AI
 
-Battleshups board and AI implementation for
+Battleships board and AI implementation for
+
+```
+https://www.hackerrank.com/challenges/battleship
+```
 
 ## Run
 
@@ -12,8 +16,4 @@ go run main.go -p
 
 ```
 go clean -testcache && go test ./...
-```
-
-```
-https://www.hackerrank.com/challenges/battleship
 ```
