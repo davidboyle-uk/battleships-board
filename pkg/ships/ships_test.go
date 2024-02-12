@@ -8,6 +8,7 @@ import (
 )
 
 func TestRandCoord(t *testing.T) {
+	t.Skip("Skipping as result is random")
 	c := randCoord(10)
 	if (c != types.Coord{}) {
 		t.Fatalf("%#v", c)
@@ -15,6 +16,7 @@ func TestRandCoord(t *testing.T) {
 }
 
 func TestPrintInPlayShips(t *testing.T) {
+	t.Skip("Skipping as results are random")
 	ships := GenerateShips(10)
 	t.Fatalf("%v\n%s", ships, ships.AsString())
 }

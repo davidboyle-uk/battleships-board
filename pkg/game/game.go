@@ -23,48 +23,74 @@ func Initialise(boardSize int) types.Game {
 }
 
 func generateBoard(boardSize int) types.Board {
-	board := types.Board{
+	b := types.Board{
 		Dim:   boardSize,
 		Moves: make(types.Moves),
 	}
 	s := ships.GenerateShips(boardSize)
+	b = addShipsToBoard(b, s)
+	return b
+}
+
+func addShipsToBoard(b types.Board, s types.Ships) types.Board {
 	for _, ship := range s {
 		for _, c := range ship.Coords {
-			board.Moves[c.String()] = types.CoordState{
+			b.Moves[c.String()] = types.CoordState{
 				Ship:  &ship,
 				State: types.SEA,
 			}
 		}
 	}
-	board.ShipTot = ships.GetVolume(s)
-	return board
+	b.ShipTot = ships.GetVolume(s)
+	return b
 }
 
 func TakeShot(from, to *types.Player, target types.Coord) string {
 	if move, ok := to.Board.Moves[target.String()]; ok {
 		if move.State != types.HIT && move.State != types.SUNK {
-			move.Ship.Hits++
-			to.Board.Moves[target.String()] = types.CoordState{
-				State: types.HIT,
-				Ship:  move.Ship,
-			}
-			// save against the player that shot
-			from.Moves[target.String()] = types.CoordState{
-				State: types.HIT,
-			}
-			from.Hits++
-		}
-		if move.Ship.Hits == len(move.Ship.Coords) {
-			for _, coord := range move.Ship.Coords {
-				to.Board.Moves[coord.String()] = types.CoordState{
-					State: types.SUNK,
-					Ship:  move.Ship,
+
+			s := move.Ship
+
+			switch {
+			case s.Hits == len(s.Coords)-1:
+				// update all coords as SUNK
+				for _, c := range s.Coords {
+					to.Board.Moves[c.String()] = types.CoordState{
+						State: types.SUNK,
+						Ship: &types.Ship{
+							Coords: s.Coords,
+							Hits:   s.Hits + 1,
+						},
+					}
+					// save against the player that shot
+					from.Moves[c.String()] = types.CoordState{
+						State: types.SUNK,
+					}
+				}
+			default:
+				// update all coords with new Hits, preserve State
+				for _, c := range s.Coords {
+					existingMove := to.Board.Moves[c.String()]
+					state := existingMove.State
+					if c == target {
+						state = types.HIT
+					}
+					to.Board.Moves[c.String()] = types.CoordState{
+						State: state,
+						Ship: &types.Ship{
+							Coords: existingMove.Ship.Coords,
+							Hits:   existingMove.Ship.Hits + 1,
+						},
+					}
 				}
 				// save against the player that shot
 				from.Moves[target.String()] = types.CoordState{
-					State: types.SUNK,
+					State: types.HIT,
 				}
 			}
+
+			// count the hit
+			from.Hits++
 		}
 	} else {
 		// save against the player that shot
