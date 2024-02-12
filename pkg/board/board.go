@@ -42,7 +42,7 @@ func BoardFromString(s string) (types.Board, error) {
 
 		s := types.State(r)
 		if s != types.SEA {
-			b.Moves[types.Coord{X: x, Y: y}] = types.CoordState{
+			b.Moves[types.Coord{X: x, Y: y}.String()] = types.CoordState{
 				State: s,
 			}
 		}

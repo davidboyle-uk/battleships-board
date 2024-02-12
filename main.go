@@ -60,8 +60,8 @@ func simulate(g types.Game) {
 func takeTurn(g types.Game) (string, error) {
 	cleanScreen()
 	shooter, opponent := determineWhosTurn(g)
-	opponenetBoardString := opponent.Board.ToString()
-	theirBoardAsWeSeeIt, err := board.BoardFromString(opponenetBoardString)
+	opponentBoardString := opponent.Board.ToString()
+	theirBoardAsWeSeeIt, err := board.BoardFromString(opponentBoardString)
 	if err != nil {
 		panic(err)
 	}

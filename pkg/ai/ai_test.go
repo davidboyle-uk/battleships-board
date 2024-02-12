@@ -1,12 +1,37 @@
 package ai
 
 import (
+	"encoding/json"
 	"reflect"
 	"testing"
 
 	"github.com/dbx123/battleships-board/pkg/board"
 	"github.com/dbx123/battleships-board/types"
 )
+
+func TestCalculateMove(t *testing.T) {
+	for name, tt := range map[string]struct {
+		boardJSON string
+		expected  types.Coord
+	}{
+		"a": {
+			boardJSON: `{"Dim":10,"Moves":{"1 1":{"Ship":{"Coords":[{"X":1,"Y":1},{"X":1,"Y":2},{"X":1,"Y":3},{"X":1,"Y":4},{"X":1,"Y":5}],"Hits":1},"State":"h"},"1 2":{"Ship":{"Coords":[{"X":1,"Y":1},{"X":1,"Y":2},{"X":1,"Y":3},{"X":1,"Y":4},{"X":1,"Y":5}],"Hits":1},"State":"h"},"1 3":{"Ship":{"Coords":[{"X":1,"Y":1},{"X":1,"Y":2},{"X":1,"Y":3},{"X":1,"Y":4},{"X":1,"Y":5}],"Hits":1},"State":"h"},"1 4":{"Ship":{"Coords":[{"X":1,"Y":1},{"X":1,"Y":2},{"X":1,"Y":3},{"X":1,"Y":4},{"X":1,"Y":5}],"Hits":1},"State":"h"},"1 5":{"Ship":{"Coords":[{"X":1,"Y":1},{"X":1,"Y":2},{"X":1,"Y":3},{"X":1,"Y":4},{"X":1,"Y":5}],"Hits":1},"State":"h"},"3 0":{"Ship":{"Coords":[{"X":1,"Y":1},{"X":1,"Y":2},{"X":1,"Y":3},{"X":1,"Y":4},{"X":1,"Y":5}],"Hits":0},"State":"-"},"3 1":{"Ship":{"Coords":[{"X":1,"Y":1},{"X":1,"Y":2},{"X":1,"Y":3},{"X":1,"Y":4},{"X":1,"Y":5}],"Hits":0},"State":"-"},"3 4":{"Ship":{"Coords":[{"X":1,"Y":1},{"X":1,"Y":2},{"X":1,"Y":3},{"X":1,"Y":4},{"X":1,"Y":5}],"Hits":1},"State":"h"},"4 0":{"Ship":{"Coords":[{"X":1,"Y":1},{"X":1,"Y":2},{"X":1,"Y":3},{"X":1,"Y":4},{"X":1,"Y":5}],"Hits":0},"State":"-"},"4 4":{"Ship":{"Coords":[{"X":1,"Y":1},{"X":1,"Y":2},{"X":1,"Y":3},{"X":1,"Y":4},{"X":1,"Y":5}],"Hits":1},"State":"h"},"5 0":{"Ship":{"Coords":[{"X":1,"Y":1},{"X":1,"Y":2},{"X":1,"Y":3},{"X":1,"Y":4},{"X":1,"Y":5}],"Hits":0},"State":"-"},"5 3":{"Ship":{"Coords":[{"X":1,"Y":1},{"X":1,"Y":2},{"X":1,"Y":3},{"X":1,"Y":4},{"X":1,"Y":5}],"Hits":0},"State":"-"},"6 0":{"Ship":{"Coords":[{"X":1,"Y":1},{"X":1,"Y":2},{"X":1,"Y":3},{"X":1,"Y":4},{"X":1,"Y":5}],"Hits":0},"State":"-"},"6 2":{"Ship":{"Coords":[{"X":1,"Y":1},{"X":1,"Y":2},{"X":1,"Y":3},{"X":1,"Y":4},{"X":1,"Y":5}],"Hits":1},"State":"h"},"6 3":{"Ship":{"Coords":[{"X":1,"Y":1},{"X":1,"Y":2},{"X":1,"Y":3},{"X":1,"Y":4},{"X":1,"Y":5}],"Hits":1},"State":"h"},"9 1":{"Ship":{"Coords":[{"X":1,"Y":1},{"X":1,"Y":2},{"X":1,"Y":3},{"X":1,"Y":4},{"X":1,"Y":5}],"Hits":0},"State":"-"},"9 2":{"Ship":{"Coords":[{"X":1,"Y":1},{"X":1,"Y":2},{"X":1,"Y":3},{"X":1,"Y":4},{"X":1,"Y":5}],"Hits":0},"State":"-"},"9 3":{"Ship":{"Coords":[{"X":1,"Y":1},{"X":1,"Y":2},{"X":1,"Y":3},{"X":1,"Y":4},{"X":1,"Y":5}],"Hits":0},"State":"-"}},"ShipTot":18}`,
+			expected:  types.Coord{1, 6},
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			var b types.Board
+			err := json.Unmarshal([]byte(tt.boardJSON), &b)
+			if err != nil {
+				t.Fatal(err)
+			}
+			actual := CalculateMove(b)
+			if !reflect.DeepEqual(tt.expected, actual) {
+				t.Fatalf("\nexpected\n%#v\ngot\n%#v\n", tt.expected, actual)
+			}
+		})
+	}
+}
 
 func TestCombineProbabilities(t *testing.T) {
 	for name, tt := range map[string]struct {
@@ -131,7 +156,7 @@ m-h-h-h--m
 -m-d---m--
 m-m--m--m-
 -m--m-m--h`,
-			out: types.Coord{6, 5},
+			out: types.Coord{5, 6},
 		},
 	} {
 		t.Run(name, func(t *testing.T) {

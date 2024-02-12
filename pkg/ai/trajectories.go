@@ -20,10 +20,10 @@ func traceTrajectory(b types.Board, hit types.Coord, t types.Trajectories, direc
 	n := hit
 	for {
 		mv := n.Add(move)
-		if _, ok := b.Moves[mv]; !ok {
+		if _, ok := b.Moves[mv.String()]; !ok {
 			break
 		}
-		next := b.Moves[mv]
+		next := b.Moves[mv.String()]
 		if next.State == types.HIT {
 			t[hit][direction] = append(t[hit][direction], mv)
 		}

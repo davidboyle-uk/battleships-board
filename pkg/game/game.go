@@ -30,8 +30,8 @@ func generateBoard(boardSize int) types.Board {
 	s := ships.GenerateShips(boardSize)
 	for _, ship := range s {
 		for _, c := range ship.Coords {
-			board.Moves[c] = types.CoordState{
-				Ship:  ship,
+			board.Moves[c.String()] = types.CoordState{
+				Ship:  &ship,
 				State: types.SEA,
 			}
 		}
@@ -41,42 +41,34 @@ func generateBoard(boardSize int) types.Board {
 }
 
 func TakeShot(from, to *types.Player, target types.Coord) string {
-	if _, ok := to.Board.Moves[target]; ok {
-		move := to.Board.Moves[target]
+	if move, ok := to.Board.Moves[target.String()]; ok {
 		if move.State != types.HIT && move.State != types.SUNK {
-			ship := move.Ship
-			ship.Hits++
-			to.Board.Moves[target] = types.CoordState{
+			move.Ship.Hits++
+			to.Board.Moves[target.String()] = types.CoordState{
 				State: types.HIT,
-				Ship:  ship,
+				Ship:  move.Ship,
 			}
 			// save against the player that shot
-			from.Moves[target] = types.CoordState{
-				State: move.State,
-				Ship:  move.Ship,
+			from.Moves[target.String()] = types.CoordState{
+				State: types.HIT,
 			}
 			from.Hits++
 		}
-		move = to.Board.Moves[target]
 		if move.Ship.Hits == len(move.Ship.Coords) {
 			for _, coord := range move.Ship.Coords {
-				to.Board.Moves[coord] = types.CoordState{
+				to.Board.Moves[coord.String()] = types.CoordState{
 					State: types.SUNK,
 					Ship:  move.Ship,
 				}
 				// save against the player that shot
-				from.Moves[target] = types.CoordState{
+				from.Moves[target.String()] = types.CoordState{
 					State: types.SUNK,
-					Ship:  move.Ship,
 				}
 			}
 		}
 	} else {
-		to.Board.Moves[target] = types.CoordState{
-			State: types.MISS,
-		}
 		// save against the player that shot
-		from.Moves[target] = types.CoordState{
+		from.Moves[target.String()] = types.CoordState{
 			State: types.MISS,
 		}
 	}

@@ -85,7 +85,7 @@ func calcProbabilities(b types.Board, hitTrajectories types.Trajectories, remain
 					continue
 				}
 				trajectory := []types.Coord{origin}
-				if _, ok := b.Moves[next]; !ok {
+				if _, ok := b.Moves[next.String()]; !ok {
 					probability := calcProbability(b.Dim, origin, direction, trajectory, remainingShips)
 					probabilities[probability] = append(probabilities[probability], next)
 					continue
@@ -99,7 +99,7 @@ func calcProbabilities(b types.Board, hitTrajectories types.Trajectories, remain
 				if next.IsOutOfBounds(b.Dim) {
 					continue
 				}
-				if _, ok := b.Moves[next]; !ok {
+				if _, ok := b.Moves[next.String()]; !ok {
 					probability := calcProbability(b.Dim, origin, direction, trajectory, remainingShips)
 					probabilities[probability] = append(probabilities[probability], next)
 				}
@@ -220,7 +220,7 @@ func calcCoordSpaces(b types.Board) []types.CoordSpace {
 				X: x,
 				Y: y,
 			}
-			if _, ok := b.Moves[c]; !ok {
+			if _, ok := b.Moves[c.String()]; !ok {
 				coordSpaces = append(coordSpaces, calcCoordSpace(c, b))
 			}
 		}
@@ -243,7 +243,7 @@ func calcCoordSpace(c types.Coord, b types.Board) types.CoordSpace {
 			if next.IsOutOfBounds(b.Dim) {
 				break
 			}
-			if _, ok := b.Moves[next]; ok {
+			if _, ok := b.Moves[next.String()]; ok {
 				break
 			}
 			if next.X > cs.MaxX {
