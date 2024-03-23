@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/dbx123/battleships-board/types"
+	"github.com/davidboyle-uk/battleships-board/types"
 )
 
 func BoardFromString(s string) (types.Board, error) {

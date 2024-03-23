@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dbx123/battleships-board/pkg/ai"
-	"github.com/dbx123/battleships-board/pkg/game"
-	"github.com/dbx123/battleships-board/types"
+	"github.com/davidboyle-uk/battleships-board/pkg/ai"
+	"github.com/davidboyle-uk/battleships-board/pkg/game"
+	"github.com/davidboyle-uk/battleships-board/types"
 )
 
 var pauseBetweenMoves bool = false

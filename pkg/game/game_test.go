@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/dbx123/battleships-board/types"
+	"github.com/davidboyle-uk/battleships-board/types"
 )
 
 func TestTakeShot(t *testing.T) {

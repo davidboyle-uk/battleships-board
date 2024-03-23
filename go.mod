@@ -1,3 +1,3 @@
-module github.com/dbx123/battleships-board
+module github.com/davidboyle-uk/battleships-board
 
 go 1.20

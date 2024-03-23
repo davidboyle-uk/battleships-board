@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/dbx123/battleships-board/pkg/board"
-	"github.com/dbx123/battleships-board/types"
+	"github.com/davidboyle-uk/battleships-board/pkg/board"
+	"github.com/davidboyle-uk/battleships-board/types"
 )
 
 func TestCalculateMove(t *testing.T) {

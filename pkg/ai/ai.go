@@ -3,7 +3,7 @@ package ai
 import (
 	"sort"
 
-	"github.com/dbx123/battleships-board/types"
+	"github.com/davidboyle-uk/battleships-board/types"
 )
 
 /*
